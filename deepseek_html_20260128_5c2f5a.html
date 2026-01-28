@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Nota Deseada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Menú lateral */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .logo p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .menu a i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding-left: 25px;
+        }
+
+        .menu .active a {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 4px solid #3498db;
+        }
+
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        /* Calculadora */
+        .calculator-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .calculator-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .calculator-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .btn-calculate {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-reset {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background-color: #d0d0d0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Resultado */
+        .result-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .result-title i {
+            margin-right: 10px;
+            color: #2ecc71;
+        }
+
+        .result-value {
+            text-align: center;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .result-value h3 {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .result-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        .result-explanation {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Información */
+        .info-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .info-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-title i {
+            margin-right: 10px;
+            color: #e74c3c;
+        }
+
+        .formula-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .note {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #f1c40f;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .menu {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .menu li {
+                margin-bottom: 0;
+            }
+            
+            .menu a {
+                padding: 10px 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .form-col {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú lateral -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h2><i class="fas fa-calculator"></i> Calculadora</h2>
+            <p>Nota deseada</p>
+        </div>
+        
+        <ul class="menu">
+            <li class="active"><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#"><i class="fas fa-calculator"></i> Calculadora</a></li>
+            <li><a href="#"><i class="fas fa-info-circle"></i> Instrucciones</a></li>
+            <li><a href="#"><i class="fas fa-history"></i> Historial</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Configuración</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> Ayuda</a></li>
+        </ul>
+        
+        <div class="footer">
+            <p>&copy; 2023 Calculadora de Notas</p>
+        </div>
+    </nav>
+    
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="header">
+            <h1>Calculadora de Nota Deseada</h1>
+            <p>Ingresa tus calificaciones para calcular la nota que necesitas en el examen final</p>
+        </div>
+        
+        <div class="calculator-container">
+            <div class="calculator-title">
+                <i class="fas fa-edit"></i> Ingresa tus calificaciones
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="q1">Nota del primer quiz (Q1)</label>
+                        <input type="number" id="q1" min="0" max="5" step="0.01" placeholder="Ej: 4.2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="p1">Nota del primer parcial (P1)</label>
+                        <input type="number" id="p1" min="0" max="5" step="0.01" placeholder="Ej: 3.8">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="q2">Nota del segundo quiz (Q2)</label>
+                        <input type="number" id="q2" min="0" max="5" step="0.01" placeholder="Ej: 4.5">
+                    </div>
+                </div>
+                
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="p2">Nota del segundo parcial (P2)</label>
+                        <input type="number" id="p2" min="0" max="5" step="0.01" placeholder="Ej: 4.0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="q3">Nota del tercer quiz (Q3)</label>
+                        <input type="number" id="q3" min="0" max="5" step="0.01" placeholder="Ej: 3.5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="q4">Nota del cuarto quiz (Q4)*</label>
+                        <input type="number" id="q4" min="0" max="5" step="0.01" placeholder="Ej: 4.7">
+                    </div>
+                </div>
+                
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="p3">Nota del tercer parcial (P3)</label>
+                        <input type="number" id="p3" min="0" max="5" step="0.01" placeholder="Ej: 4.2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notaDeseada">Nota deseada en el curso</label>
+                        <input type="number" id="notaDeseada" min="0" max="5" step="0.01" value="3.0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn-calculate" id="calcularBtn">
+                    <i class="fas fa-calculator"></i> Calcular nota necesaria
+                </button>
+                <button class="btn-reset" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reiniciar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Resultado -->
+        <div class="result-container" id="resultado">
+            <div class="result-title">
+                <i class="fas fa-chart-line"></i> Resultado del cálculo
+            </div>
+            
+            <div class="result-value">
+                <h3>Nota que necesitas en el examen final:</h3>
+                <div class="result-number" id="notaFinal">0.000</div>
+            </div>
+            
+            <div class="result-explanation">
+                <p>Esta es la nota que debes obtener en tu examen final para alcanzar la calificación deseada en el curso, considerando que:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Cada quiz (Q) representa el 5% de la nota final (0.05 cada uno)</li>
+                    <li>Cada parcial (P) representa el 20% de la nota final (0.20 cada uno)</li>
+                    <li>El examen final representa el 20% de la nota final (0.20)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Información -->
+        <div class="info-container">
+            <div class="info-title">
+                <i class="fas fa-info-circle"></i> Información importante
+            </div>
+            
+            <p>Esta calculadora te ayuda a determinar qué nota necesitas obtener en tu examen final para alcanzar la calificación deseada en el curso.</p>
+            
+            <div class="formula-box">
+                <strong>Fórmula utilizada:</strong><br>
+                X = [NotaDeseada - (Q1+Q2+Q3+Q4)*0.05 - (P1+P2+P3)*0.20] / 0.20
+            </div>
+            
+            <p>Donde:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li><strong>Q1, Q2, Q3, Q4:</strong> Notas de los quizzes (cada uno vale 5%)</li>
+                <li><strong>P1, P2, P3:</strong> Notas de los parciales (cada uno vale 20%)</li>
+                <li><strong>X:</strong> Nota necesaria en el examen final (vale 20%)</li>
+                <li><strong>NotaDeseada:</strong> Calificación que quieres obtener en el curso</li>
+            </ul>
+            
+            <div class="note">
+                <strong>Nota:</strong> En el código original proporcionado, se menciona un cuarto quiz (Q4) que no se solicita en los inputs. En esta calculadora hemos incluido el Q4 para mayor precisión en el cálculo. Si no tienes cuarto quiz, puedes ingresar 0 en ese campo.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Elementos del DOM
+        const calcularBtn = document.getElementById('calcularBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultado = document.getElementById('resultado');
+        const notaFinal = document.getElementById('notaFinal');
+        
+        // Campos de entrada
+        const inputs = [
+            'q1', 'q2', 'q3', 'q4', 'p1', 'p2', 'p3', 'notaDeseada'
+        ];
+        
+        // Calcular la nota necesaria
+        calcularBtn.addEventListener('click', function() {
+            // Obtener valores de los inputs
+            const valores = {};
+            let todosLlenos = true;
+            
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                const valor = parseFloat(input.value);
+                
+                // Validar que el campo no esté vacío
+                if (isNaN(valor)) {
+                    input.style.borderColor = '#e74c3c';
+                    todosLlenos = false;
+                } else {
+                    // Validar que esté en el rango 0-5
+                    if (valor < 0 || valor > 5) {
+                        input.style.borderColor = '#e74c3c';
+                        todosLlenos = false;
+                        alert(`Por favor ingresa un valor entre 0 y 5 para ${id.toUpperCase()}`);
+                    } else {
+                        input.style.borderColor = '#ddd';
+                        valores[id] = valor;
+                    }
+                }
+            });
+            
+            if (!todosLlenos) {
+                alert('Por favor completa todos los campos con valores entre 0 y 5');
+                return;
+            }
+            
+            // Calcular según la fórmula: X = [NotaDeseada - (Q1+Q2+Q3+Q4)*0.05 - (P1+P2+P3)*0.20] / 0.20
+            const sumaQuizzes = valores.q1 + valores.q2 + valores.q3 + valores.q4;
+            const sumaParciales = valores.p1 + valores.p2 + valores.p3;
+            
+            const Xn = valores.notaDeseada - (sumaQuizzes * 0.05) - (sumaParciales * 0.20);
+            const Xd = 0.20;
+            const X = Xn / Xd;
+            
+            // Mostrar resultado
+            notaFinal.textContent = X.toFixed(3);
+            
+            // Cambiar color según el resultado
+            if (X > 5) {
+                notaFinal.style.color = '#e74c3c';
+                notaFinal.innerHTML += ' <span style="font-size: 1rem;">(Imposible, necesitas más de 5.0)</span>';
+            } else if (X > 3.5) {
+                notaFinal.style.color = '#e67e22';
+            } else if (X >= 0) {
+                notaFinal.style.color = '#2ecc71';
+            } else {
+                notaFinal.style.color = '#2ecc71';
+                notaFinal.innerHTML += ' <span style="font-size: 1rem;">(Ya superaste la nota deseada)</span>';
+            }
+            
+            // Mostrar el resultado
+            resultado.style.display = 'block';
+            
+            // Desplazar hacia el resultado
+            resultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        
+        // Reiniciar formulario
+        resetBtn.addEventListener('click', function() {
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                input.value = '';
+                input.style.borderColor = '#ddd';
+            });
+            
+            // Restaurar el valor de nota deseada
+            document.getElementById('notaDeseada').value = '3.0';
+            
+            // Ocultar resultado
+            resultado.style.display = 'none';
+        });
+        
+        // Validación en tiempo real para inputs
+        inputs.forEach(id => {
+            const input = document.getElementById(id);
+            
+            input.addEventListener('input', function() {
+                const valor = parseFloat(this.value);
+                
+                if (isNaN(valor) || valor < 0 || valor > 5) {
+                    this.style.borderColor = '#e74c3c';
+                } else {
+                    this.style.borderColor = '#ddd';
+                }
+            });
+        });
+        
+        // Ejemplo de datos para probar
+        function cargarEjemplo() {
+            const ejemplo = {
+                q1: 4.2,
+                p1: 3.8,
+                q2: 4.5,
+                p2: 4.0,
+                q3: 3.5,
+                q4: 4.7,
+                p3: 4.2,
+                notaDeseada: 3.0
+            };
+            
+            Object.keys(ejemplo).forEach(key => {
+                document.getElementById(key).value = ejemplo[key];
+            });
+        }
+        
+        // Cargar ejemplo automáticamente (solo para demostración)
+        // Comentar esta línea si no se quiere que se cargue automáticamente
+        window.addEventListener('DOMContentLoaded', cargarEjemplo);
+    </script>
+</body>
+</html>
